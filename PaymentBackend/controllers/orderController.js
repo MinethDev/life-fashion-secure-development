@@ -106,24 +106,42 @@ const placeOrderStripe = async (req, res) => {
 }
 
 // Verify Stripe 
-const verifyStripe = async (req,res) => {
-    const {orderId, success, userId} = req.body
+const verifyStripe = async (req, res) => {
+    const { orderId, success, userId } = req.body
 
     try {
 
+        // Verify that the order belongs to the authenticated user
+        const order = await orderModel.findOne({
+            _id: orderId,
+            userId: userId
+        });
+
+        if (!order) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized order access"
+            });
+        }
+
         if (success === "true") {
-            await orderModel.findByIdAndUpdate(orderId, {payment:true});
-            await userModel.findByIdAndUpdate(userId, {cartData: {}})
-            res.json({success: true});
+            await orderModel.findByIdAndUpdate(orderId, { payment: true });
+            await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+            return res.json({ success: true });
         }
         else {
-            await orderModel.findByIdAndDelete(orderId)
-            res.json({success: false})
+            await orderModel.findByIdAndDelete(orderId);
+
+            return res.json({ success: false });
         }
-        
+
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 }
 
