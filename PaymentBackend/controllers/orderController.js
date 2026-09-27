@@ -2,7 +2,6 @@ import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from "stripe";
 import razorpay from "razorpay";
-import productModel from "../models/productModel.js";
 
 // Global Variables
 const currency = "lkr";
@@ -18,7 +17,7 @@ const razorpayInstance = new razorpay({
 // Placing orders using COD method
 const placeOrder = async (req, res) => {
   try {
-    const { items, address } = req.body;
+    const { userId, items, amount, address } = req.body;
 
     if (!items || items.length === 0) {
       return res.json({
@@ -27,28 +26,11 @@ const placeOrder = async (req, res) => {
       });
     }
 
-    let calculatedAmount = 0;
-
-    for (const item of items) {
-      const product = await productModel.findById(item._id);
-
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
-
-      calculatedAmount += product.price * item.quantity;
-    }
-
-    calculatedAmount += deliveryCharge;
-
     const orderData = {
-      userId: req.body.userId,
+      userId,
       items,
       address,
-      amount: calculatedAmount,
+      amount,
       paymentMethod: "COD",
       payment: false,
       date: Date.now(),
@@ -57,22 +39,15 @@ const placeOrder = async (req, res) => {
     const newOrder = new orderModel(orderData);
     await newOrder.save();
 
-    await userModel.findByIdAndUpdate(req.body.userId, {
-      cartData: {},
-    });
+    await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-    res.json({
-      success: true,
-      message: "Order Placed",
-    });
+    res.json({ success: true, message: "Order Placed" });
   } catch (error) {
     console.log(error);
-    res.json({
-      success: false,
-      message: error.message,
-    });
+    res.json({ success: false, message: error.message });
   }
 };
+
 // Placing orders using Stripe method
 const placeOrderStripe = async (req, res) => {
   try {
@@ -115,13 +90,10 @@ const placeOrderStripe = async (req, res) => {
     });
 
     const session = await stripe.checkout.sessions.create({
-      success_url: `${origin}/verify?session_id={CHECKOUT_SESSION_ID}&orderId=${newOrder._id}`,
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
       cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
       line_items,
       mode: "payment",
-      metadata: {
-        orderId: newOrder._id.toString(),
-      },
     });
 
     res.json({ success: true, session_url: session.url });
@@ -268,7 +240,6 @@ const verifyRazorpay = async (req, res) => {
     });
   }
 };
-
 // All Orders Data fro Admin Panel
 const allOrders = async (req, res) => {
   try {
@@ -292,7 +263,6 @@ const userOrders = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
 // Update order status from admin pannel
 const updateStatus = async (req, res) => {
   try {
@@ -315,8 +285,8 @@ const deleteOrder = async (req, res) => {
 
     if (!deletedOrder) {
       return res
-          .status(404)
-          .json({ success: false, message: "Order not found" });
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     res.json({ success: true, message: "Order deleted successfully" });

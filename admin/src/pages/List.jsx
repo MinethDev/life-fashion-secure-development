@@ -102,82 +102,236 @@ const List = ({ token }) => {
   );
 
   return (
-    <>
-      <SearchBar onSearch={setSearch} />
-      <p className='mb-2'>All Products List</p>
-
-      <div className='flex flex-col gap-2'>
-        <div className='hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr_1fr] items-center py-1 px-2 border bg-gray-100 text-sm'>
-          <b>Image</b>
-          <b>Name</b>
-          <b>Category</b>
-          <b>Subcategory</b>
-          <b>Price</b>
-          <b>Action</b>
+  <>
+    <div className='mb-6'>
+      <div className='flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <h1 className='text-2xl font-semibold text-gray-800'>
+            All Products
+          </h1>
+          <p className='mt-1 text-sm text-gray-500'>
+            Manage your store products
+          </p>
         </div>
 
+        <div className='text-sm text-gray-500'>
+          {filteredList.length} product{filteredList.length !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      <SearchBar onSearch={setSearch} />
+    </div>
+
+    <div className='overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl'>
+
+      {/* Table Header */}
+      <div className='hidden md:grid grid-cols-[80px_3fr_1fr_1fr_1fr_100px] items-center gap-4 px-5 py-4 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wide'>
+        <div>Image</div>
+        <div>Product</div>
+        <div>Category</div>
+        <div>Subcategory</div>
+        <div>Price</div>
+        <div className='text-center'>Actions</div>
+      </div>
+
+      {/* Products */}
+      <div className='divide-y divide-gray-100'>
         {filteredList.map((item, index) => (
-          <div className='grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm' key={index}>
-            <img className='w-12' src={item.Image[0]} alt='' />
-            <p>{item.name}</p>
-            <p>{item.category}</p>
-            <p>{item.subcategory}</p>
-            <p>{currency}{item.price}</p>
-            <div className='flex gap-2'>
-              <FaPencilAlt className='cursor-pointer text-blue-500' onClick={() => updateProduct(item)} />
-              <p onClick={() => removeProduct(item._id)} className='cursor-pointer text-lg text-red-500'>X</p>
+          <div
+            key={index}
+            className='grid grid-cols-1 md:grid-cols-[80px_3fr_1fr_1fr_1fr_100px] items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors duration-150'
+          >
+
+            {/* Image */}
+            <div className='flex items-center'>
+              <div className='overflow-hidden bg-gray-100 border border-gray-200 rounded-lg w-14 h-14'>
+                <img
+                  className='object-cover w-full h-full'
+                  src={item.image[0]}
+                  alt={item.name}
+                />
+              </div>
+            </div>
+
+            {/* Product Name */}
+            <div className='min-w-0'>
+              <p className='font-medium text-gray-800 truncate'>
+                {item.name}
+              </p>
+              <p className='mt-1 text-xs text-gray-400'>
+                Product
+              </p>
+            </div>
+
+            {/* Category */}
+            <div>
+              <span className='inline-flex px-2.5 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-600'>
+                {item.category}
+              </span>
+            </div>
+
+            {/* Subcategory */}
+            <div className='text-sm text-gray-600'>
+              {item.subCategory}
+            </div>
+
+            {/* Price */}
+            <div className='font-semibold text-gray-800'>
+              {currency}{item.price}
+            </div>
+
+            {/* Actions */}
+            <div className='flex items-center justify-center gap-2'>
+
+              <button
+                type='button'
+                title='Edit product'
+                onClick={() => updateProduct(item)}
+                className='flex items-center justify-center text-blue-500 transition border border-gray-200 rounded-lg w-9 h-9 hover:bg-blue-50 hover:border-blue-200'
+              >
+                <FaPencilAlt size={14} />
+              </button>
+
+              <button
+                type='button'
+                title='Delete product'
+                onClick={() => removeProduct(item._id)}
+                className='flex items-center justify-center text-red-500 transition border border-gray-200 rounded-lg w-9 h-9 hover:bg-red-50 hover:border-red-200'
+              >
+                ×
+              </button>
+
             </div>
           </div>
         ))}
       </div>
 
-      {editingProduct && (
-        <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-          <div className='bg-white p-6 rounded-lg w-96'>
-            <h2 className='text-xl font-semibold mb-4'>Edit Product</h2>
-            <label className='block mb-2'>Name:</label>
-            <input type='text' name='name' value={updatedData.name || ''} onChange={handleInputChange} className='w-full p-2 border rounded' />
-
-            <label className='block mt-2 mb-2'>Description:</label>
-            <textarea name='description' value={updatedData.description || ''} onChange={handleInputChange} className='w-full p-2 border rounded'></textarea>
-
-            <label className='block mt-2 mb-2'>Category:</label>
-            <select name='category' value={updatedData.category || ''} onChange={handleInputChange} className='w-full p-2 border rounded'>
-              <option value='Men'>Men</option>
-              <option value='Women'>Women</option>
-              <option value='Kids'>Kids</option>
-            </select>
-
-            <label className='block mt-2 mb-2'>Subcategory:</label>
-            <select name='subcategory' value={updatedData.subcategory || ''} onChange={handleInputChange} className='w-full p-2 border rounded'>
-              <option value='Topwear'>Topwear</option>
-              <option value='Bottomwear'>Bottomwear</option>
-              <option value='Winterwear'>Winterwear</option>
-            </select>
-
-            <label className='block mt-2 mb-2'>Price:</label>
-            <input type='number' name='price' value={updatedData.price || ''} onChange={handleInputChange} className='w-full p-2 border rounded' />
-
-            <label className='block mt-2 mb-2'>Sizes:</label>
-            <div className='flex gap-3'>
-              {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                <div key={size} onClick={() => handleSizeChange(size)}>
-                  <p className={updatedData.sizes.includes(size) ? 'bg-pink-100' : 'bg-slate-200'} px-3 py-1 cursor-pointer>
-                    {size}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className='flex justify-end mt-4'>
-              <button className='bg-gray-400 px-4 py-2 rounded mr-2' onClick={() => setEditingProduct(null)}>Cancel</button>
-              <button className='bg-blue-500 text-white px-4 py-2 rounded' onClick={saveUpdatedProduct}>Save</button>
-            </div>
-          </div>
+      {/* Empty State */}
+      {filteredList.length === 0 && (
+        <div className='py-12 text-center'>
+          <p className='text-gray-500'>No products found.</p>
+          {search && (
+            <p className='mt-1 text-sm text-gray-400'>
+              Try searching for a different product.
+            </p>
+          )}
         </div>
       )}
-    </>
-  );
+
+    </div>
+
+    {/* Edit Product Modal */}
+    {editingProduct && (
+      <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50'>
+        <div className='bg-white p-6 rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl'>
+
+          <h2 className='mb-5 text-xl font-semibold'>
+            Edit Product
+          </h2>
+
+          <label className='block mb-2 text-sm font-medium'>Name:</label>
+          <input
+            type='text'
+            name='name'
+            value={updatedData.name || ''}
+            onChange={handleInputChange}
+            className='w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100'
+          />
+
+          <label className='block mt-4 mb-2 text-sm font-medium'>
+            Description:
+          </label>
+          <textarea
+            name='description'
+            value={updatedData.description || ''}
+            onChange={handleInputChange}
+            className='w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100'
+            rows='4'
+          />
+
+          <label className='block mt-4 mb-2 text-sm font-medium'>
+            Category:
+          </label>
+          <select
+            name='category'
+            value={updatedData.category || ''}
+            onChange={handleInputChange}
+            className='w-full p-2.5 border border-gray-300 rounded-lg'
+          >
+            <option value='Men'>Men</option>
+            <option value='Women'>Women</option>
+            <option value='Kids'>Kids</option>
+          </select>
+
+          <label className='block mt-4 mb-2 text-sm font-medium'>
+            Subcategory:
+          </label>
+          <select
+            name='subCategory'
+            value={updatedData.subCategory || ''}
+            onChange={handleInputChange}
+            className='w-full p-2.5 border border-gray-300 rounded-lg'
+          >
+            <option value='Topwear'>Topwear</option>
+            <option value='Bottomwear'>Bottomwear</option>
+            <option value='Winterwear'>Winterwear</option>
+          </select>
+
+          <label className='block mt-4 mb-2 text-sm font-medium'>
+            Price:
+          </label>
+          <input
+            type='number'
+            name='price'
+            value={updatedData.price || ''}
+            onChange={handleInputChange}
+            className='w-full p-2.5 border border-gray-300 rounded-lg'
+          />
+
+          <label className='block mt-4 mb-2 text-sm font-medium'>
+            Sizes:
+          </label>
+
+          <div className='flex flex-wrap gap-2'>
+            {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+              <button
+                type='button'
+                key={size}
+                onClick={() => handleSizeChange(size)}
+                className={`px-3 py-1.5 rounded-md border text-sm transition ${
+                  updatedData.sizes.includes(size)
+                    ? 'bg-pink-100 border-pink-300 text-pink-700'
+                    : 'bg-gray-100 border-gray-200 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+
+          <div className='flex justify-end gap-2 mt-6'>
+            <button
+              type='button'
+              className='px-4 py-2 transition bg-gray-100 rounded-lg hover:bg-gray-200'
+              onClick={() => setEditingProduct(null)}
+            >
+              Cancel
+            </button>
+
+            <button
+              type='button'
+              className='px-4 py-2 text-white transition bg-blue-500 rounded-lg hover:bg-blue-600'
+              onClick={saveUpdatedProduct}
+            >
+              Save
+            </button>
+          </div>
+
+        </div>
+      </div>
+    )}
+  </>
+);;
 };
 
 export default List;
