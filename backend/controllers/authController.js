@@ -31,7 +31,7 @@ const verify = (req, res) => {
 };
 const signup = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password } = req.body;
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -40,12 +40,12 @@ const signup = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = new User({
-            name,
-            email,
-            password: hashedPassword,
-            role
-        });
+       const newUser = new User({
+             name,
+             email,
+              password: hashedPassword,
+              role: "customer"
+    });
 
         await newUser.save();
 
