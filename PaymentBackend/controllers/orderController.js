@@ -103,28 +103,28 @@ const placeOrderStripe = async (req, res) => {
   }
 };
 
-// Verify Stripe
+// Verify Stripe 
 const verifyStripe = async (req, res) => {
-  const { orderId, sessionId, userId } = req.body;
+const { orderId, sessionId, userId } = req.body;
 
-  try {
+try {
     const order = await orderModel.findOne({
-      _id: orderId,
-      userId: userId,
+        _id: orderId,
+        userId: userId,
     });
 
     if (!order) {
-      return res.status(403).json({
-        success: false,
-        message: "Unauthorized order access",
-      });
+        return res.status(403).json({
+            success: false,
+            message: "Unauthorized order access",
+        });
     }
 
     if (!sessionId) {
-      return res.status(400).json({
-        success: false,
-        message: "Stripe session ID is required",
-      });
+        return res.status(400).json({
+            success: false,
+            message: "Stripe session ID is required",
+        });
     }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -133,32 +133,32 @@ const verifyStripe = async (req, res) => {
         session.payment_status !== "paid" ||
         session.metadata?.orderId !== orderId
     ) {
-      return res.status(400).json({
-        success: false,
-        message: "Payment verification failed",
-      });
+        return res.status(400).json({
+            success: false,
+            message: "Payment verification failed",
+        });
     }
 
     await orderModel.findByIdAndUpdate(orderId, {
-      payment: true,
+        payment: true,
     });
 
     await userModel.findByIdAndUpdate(userId, {
-      cartData: {},
+        cartData: {},
     });
 
     return res.json({
-      success: true,
-      message: "Payment verified successfully",
+        success: true,
+        message: "Payment verified successfully",
     });
-  } catch (error) {
+} catch (error) {
     console.log(error);
 
     return res.status(500).json({
-      success: false,
-      message: error.message,
+        success: false,
+        message: error.message,
     });
-  }
+}
 };
 
 // Placing orders using Razorpay method
