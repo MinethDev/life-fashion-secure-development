@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Add from './pages/Add';
 import List from './pages/List';
-import Order from './pages/Order';
+import Orders from './pages/Order';
 import Login from './components/Login';
 import { ToastContainer } from 'react-toastify';
 
@@ -16,14 +16,16 @@ const App = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+  if (token) {
     localStorage.setItem('token', token);
-    if (!token) {
-      navigate('/login');
-    }
-  }, [token, navigate]);
+  } else {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }
+}, [token, navigate]);
 
   return (
-    <div className='bg-gray-50 min-h-screen'>
+    <div className='min-h-screen bg-gray-50'>
       <ToastContainer />
       {token === '' ? (
         <Login setToken={setToken} />
@@ -37,7 +39,7 @@ const App = () => {
               <Routes>
                 <Route path='/add' element={<Add token={token} />} />
                 <Route path='/list' element={<List token={token} />} />
-                <Route path='/order' element={<Order token={token} />} />
+                <Route path='/order' element={<Orders token={token} />} />
                
                 
               </Routes>

@@ -6,6 +6,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -14,6 +15,7 @@ const login = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -30,25 +32,38 @@ const login = async (req, res) => {
     res.status(200).json({
       success: true,
       token,
-      user: { _id: user._id, name: user.name, role: user.role },
+      user: {
+        _id: user._id,
+        name: user.name,
+        role: user.role,
+      },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 };
 
 const verify = (req, res) => {
-  res.status(200).json({ success: true, user: req.user });
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
 };
+
 const signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ success: false, error: "User already exists" });
+      return res.status(400).json({
+        success: false,
+        error: "User already exists",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -57,7 +72,7 @@ const signup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role,
+      role: "customer",
     });
 
     await newUser.save();
@@ -71,10 +86,18 @@ const signup = async (req, res) => {
     res.status(201).json({
       success: true,
       token,
-      user: { _id: newUser._id, name: newUser.name, role: newUser.role },
+      user: {
+        _id: newUser._id,
+        name: newUser.name,
+        role: newUser.role,
+      },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 };
+
 export { login, verify, signup };
