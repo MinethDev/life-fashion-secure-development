@@ -15,6 +15,7 @@ import { Footer } from './Components/Footer'
 import Searchbar from './Components/Searchbar'
 import { ToastContainer, toast } from 'react-toastify';
 import Verify from './Pages/Verify'
+import GoogleSuccess from './Pages/GoogleSuccess'
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
     <Route path='/placeOrder' element={<PlaceOrder/>} />
     <Route path='/Order' element={<Order/>} />
     <Route path='/verify' element={<Verify/>} />
+    <Route path='/google-success' element={<GoogleSuccess/>} />
 
       </Routes>
       <Footer/>
