@@ -8,6 +8,7 @@ import productRouter from './routes/productRoute.js'
 import cartRouter from './routes/cartRoute.js'
 import orderRouter from './routes/orderRoute.js'
 import orderRoutes from './routes/orderRoute.js';
+import passport from './config/passport.js';
 
 // app config
 const app = express()
@@ -19,6 +20,7 @@ connectCloudinary()
 // middlewares
 app.use(express.json())
 app.use(cors())
+app.use(passport.initialize())
 
 // api endpoints
 app.use('/api/user', userRouter)

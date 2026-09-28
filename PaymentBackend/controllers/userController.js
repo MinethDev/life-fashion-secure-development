@@ -93,4 +93,18 @@ try {
 }
 }
 
-export { loginUser, registerUser, adminLogin }
+// Google OAuth callback
+const googleCallback = async (req, res) => {
+    try {
+        const token = createToken(req.user._id);
+
+        res.redirect(
+            `http://localhost:5174/google-success?token=${token}`
+        );
+    } catch (error) {
+        console.log(error);
+        res.redirect('http://localhost:5174/login');
+    }
+}
+
+export { loginUser, registerUser, adminLogin, googleCallback }
