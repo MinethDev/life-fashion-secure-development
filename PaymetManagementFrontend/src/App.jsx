@@ -13,8 +13,9 @@ import Navbar from "./Components/Navbar";
 import Home from "./Pages/Home";
 import { Footer } from "./Components/Footer";
 import Searchbar from "./Components/Searchbar";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Verify from "./Pages/Verify";
+import GoogleSuccess from "./Pages/GoogleSuccess";
 import TrackOrder from "./Pages/TrackOrder";
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
       <ToastContainer />
       <Navbar />
       <Searchbar />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collection" element={<Collection />} />
@@ -34,8 +36,17 @@ const App = () => {
         <Route path="/placeOrder" element={<PlaceOrder />} />
         <Route path="/Order" element={<Order />} />
         <Route path="/verify" element={<Verify />} />
-        <Route path="/track-order/:orderId" element={<TrackOrder />} />
+
+        {/* Google OAuth */}
+        <Route path="/google-success" element={<GoogleSuccess />} />
+
+        {/* Order Tracking */}
+        <Route
+          path="/track-order/:orderId"
+          element={<TrackOrder />}
+        />
       </Routes>
+
       <Footer />
     </div>
   );

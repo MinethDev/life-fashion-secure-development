@@ -4,12 +4,13 @@ import authRouter from './routes/auth.js';
 import connectToDatabase from './db/db.js';
 import employeeRouter from './routes/employee.js';
 import departmentRouter from './routes/department.js';
-
+import helmet from 'helmet';
 
 
 connectToDatabase()
 
 const app = express()
+app.use(helmet())
 app.use(cors())
 app.use(express.json())
 app.use(express.static('public/uploads'))
